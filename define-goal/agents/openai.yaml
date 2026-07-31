@@ -1,0 +1,6 @@
+# OpenAI/Codex UI metadata only.
+# Claude Code discovers the skill from ../SKILL.md and ignores this file.
+interface:
+  display_name: "Define Goal"
+  short_description: "Clarify goals and write portable goal briefs"
+  default_prompt: "Use $define-goal to clarify this intention and save a cross-harness goal brief under docs/goals."
