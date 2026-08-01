@@ -20,40 +20,6 @@ Order questions by dependency, impact, irreversibility, and cost of being wrong.
 A useful question gives a recommendation, its basis, and the strongest
 counterargument. Do not turn the interview into a questionnaire.
 
-## Classification
-
-### Execution
-
-Use when an observable system or artifact must change. Require:
-
-- starting state or a first-step reproduction;
-- allowed change surface;
-- result validator;
-- constraint validator;
-- plausible anti-cheat guard;
-- rollback or escalation trigger.
-
-### Exploration
-
-Use when the deliverable is knowledge or a decision. Require:
-
-- the decision the work must enable;
-- source and recency boundaries;
-- evidence standard and reproducibility;
-- treatment of conflicting or missing evidence;
-- a research budget or stop rule;
-- an honest "best answer so far" outcome when uncertainty remains.
-
-Do not reward a large number of sources or conclusions. Two reproducible,
-decision-relevant findings are better than ten padded claims.
-
-### Mixed
-
-Use only when a named exploratory decision gates a bounded execution phase.
-State the gate, the allowed choices, and what happens if evidence cannot resolve
-it. Split separate goals when phases have different owners, permissions, or
-independent completion conditions.
-
 ## Evidence patterns
 
 | Domain | Outcome evidence | Constraint evidence |
@@ -108,14 +74,21 @@ section out of independent goals instead of filling it with decorative text.
 
 ## Stop and resume
 
-Use bounded persistence, not endless grinding. Typical stop conditions:
+Use bounded persistence, not endless grinding. Stop conditions written into a
+goal are limited to these kinds:
 
 - an observed baseline contradicts a material premise;
 - the same validator fails three times without a new hypothesis;
 - required authority, credentials, or external approval is missing;
 - a destructive or externally visible action is needed but not authorized;
 - the time, turn, cost, or source budget is exhausted;
-- progress would require expanding the approved scope.
+- progress would require a substantive scope change (mechanical spillover such
+  as import updates is allowed with a one-line note in the progress file).
+
+Process hygiene — commit state, branch layout, file tracking status, document
+status values, or the existence of a progress file — is never a precondition
+or stop condition. At most it appears as one advisory line in the acceptance
+report.
 
 For work likely to span sessions, authorize a separate progress file such as
 `docs/goals/<goal-slug>.progress.md`. The progress file records evidence,
@@ -141,6 +114,9 @@ explicitly says otherwise.
   executor to revalidate drift-prone facts before mutation.
 - Keep the approved goal immutable across handoff. Record execution progress in
   a separate file and require owner confirmation for amendments.
-- If the receiving harness cannot access a required source, tool, credential,
-  or environment, treat that as a stop condition rather than filling the gap by
+- If the receiving harness lacks a required tool, install a missing common
+  open-source tool when the goal's agent-decided defaults authorize it — never
+  sudo or system-level changes. For anything that cannot be installed, such as
+  credentials, external services, or environments, mark only the affected items
+  as unverified, complete the rest, and report the gap; never fill it by
   inference.

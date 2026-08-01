@@ -29,7 +29,9 @@ established domain terms.
 - Protect pre-existing working-tree state. Do not modify or clean it during
   definition, and do not describe every out-of-scope or frozen path as an
   existing worktree change. If an existing change overlaps the goal and its
-  ownership cannot be established, make that a stop condition.
+  ownership cannot be established, require the executor to freeze the
+  overlapping paths and continue elsewhere; stop only when the overlap is the
+  goal's core target.
 - Never read or print secrets, credential files, cookies, tokens, or
   environment-variable values.
 
@@ -84,19 +86,13 @@ When `git status` is available, distinguish:
 Record only the first category as pre-existing worktree state. If it is empty,
 say so explicitly while still requiring the executor to recheck. If an existing
 change overlaps the approved scope, require the executor to preserve its
-unrelated portions; stop when ownership cannot be determined safely.
+unrelated portions, freeze overlapping paths whose ownership cannot be
+determined, and continue on the rest.
 
-### 3. Classify and map the goal
+### 3. Map the goal
 
 Read [references/goal-patterns.md](references/goal-patterns.md) before the
-interview. Classify the work as:
-
-- **execution**: completion can be shown by a changed state and checks;
-- **exploration**: completion is a decision or answer supported by reproducible
-  evidence;
-- **mixed**: exploration must resolve a named decision before bounded execution.
-
-Build a private decision map ordered by dependency, impact, reversibility, and
+interview. Build a private decision map ordered by dependency, impact, reversibility, and
 cost of being wrong. Track known facts, assumptions, preferences, accepted
 decisions, rejected alternatives, and open questions.
 
@@ -122,6 +118,10 @@ Decide long-tail, non-load-bearing points on the user's behalf. For each such
 default, record one sentence of reasoning and the cost of being wrong, then put
 all defaults in an "Agent-decided defaults (change before approval)" list for
 the owner to flip in one pass. Do not interrupt the interview for these points.
+Unless the owner objects, include a standing default that authorizes installing
+missing common open-source tools through standard package managers — never
+sudo or system-level changes — with each install recorded in the progress
+file.
 
 After five resolved decisions, or at a major dependency boundary, summarize
 accepted decisions and remaining high-impact branches. Stop interviewing once
@@ -151,8 +151,8 @@ The draft must answer all of these:
 
 Reject activity goals such as "make progress", "keep investigating", or
 "improve X". Replace decorative precision with the most honest observable
-validator. For exploration, measure evidence quality and the decision enabled,
-not arbitrary source or conclusion counts.
+validator. For research goals, measure evidence quality and the decision
+enabled, not arbitrary source or conclusion counts.
 
 Keep the brief's length proportional to its risk and coordination burden. Keep
 a small goal to one page when that is enough to remain self-contained.
@@ -235,8 +235,6 @@ Return:
 - a clickable path to the goal document;
 - the exact `/goal ...` command to run;
 - validation evidence;
-- a reminder to commit the approved document before execution starts, so
-  acceptance can diff against that commit as its tamper-check baseline;
 - any still-open, explicitly deferred issue.
 
 If the user explicitly asks to start now and the runtime exposes goal-control
@@ -257,32 +255,31 @@ Acceptance must be performed by an agent whose context did not do the work: a
 fresh session started by the owner, or a subagent the executing agent spawns
 right after the Completion Contract evidence is in. A spawning executor passes
 only the goal document path and relays the acceptance report verbatim, without
-rewriting or summarizing it. Never grade work your own context performed; an
-executor that cannot spawn a subagent hands the owner the acceptance command
-instead of accepting.
+rewriting or summarizing it. Never close a goal based on grading work your own
+context performed. An executing agent asked to accept and unable to spawn a
+subagent must not return empty-handed: run the checks anyway, deliver the same
+report clearly labeled as a non-independent self-check, leave the status
+untouched, and attach the acceptance command for a fresh session.
 
 In the accepting agent:
 
 1. Read the goal document, its authorized progress file when present, current
    repository rules, and current worktree state.
-2. Check that the approved contract survived execution unmodified: diff the
-   goal file against its last approved commit. Only an appended closure record
-   may differ. If the body changed, or no committed baseline exists, say so in
-   the report instead of silently treating the current text as the approved
-   contract.
-3. Personally rerun every command named by the Completion Contract. Prior logs
+2. Personally rerun every command named by the Completion Contract. Prior logs
    are context, not proof that the current state passes.
-4. Derive and run two or three checks not named in the goal document. Choose
+3. Derive and run two or three checks not named in the goal document. Choose
    them at acceptance time from the highest-risk boundaries, anti-cheat rules,
    and likely collateral effects.
-5. If a required command cannot run, report that item as unverified and do not
-   infer, guess, or close the goal.
-6. If every Completion Contract item and every spot check passed, change the
+4. If a required command cannot run, report that item as unverified; do not
+   infer or guess its result.
+5. If every Completion Contract item and every spot check passed, change the
    visible status to `已完成`/`Completed`, append the level-two section shown
-   below, and rerun `validate_goal.py`. If anything failed or could not be
-   verified, leave the status and document untouched; flipping to
-   `已废弃`/`Abandoned` always requires an explicit owner decision.
-7. End with a plain-language report of no more than five lines covering: pass
+   below, and rerun `validate_goal.py`. Otherwise leave the status untouched —
+   unless the owner explicitly instructs closure or abandonment, in which case
+   comply and record the failed or unverified items honestly in the closure
+   record. Flipping to `已废弃`/`Abandoned` always requires an explicit owner
+   decision.
+6. End with a plain-language report of no more than five lines covering: pass
    or fail; what was actually delivered; unmet or unverified items; the
    independent spot checks; and whether the goal was closed, or what decision
    the owner still needs to make. Closure is one status line plus one appended

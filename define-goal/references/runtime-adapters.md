@@ -72,19 +72,12 @@ a fresh agent with repository access and no definition-session context.
 
 ### Availability boundaries
 
-- User-level discovery requires the `user` setting source. A session that
-  explicitly excludes it will not load this personal skill.
-- `--safe-mode` or `--disable-slash-commands` disables custom skills.
 - Claude Code's `/goal` requires a trusted workspace and enabled hooks. If
   managed policy disables hooks, return the launch sentence as an ordinary
   prompt and state that automatic continuation is unavailable.
 - Claude's goal evaluator judges the conversation; it does not independently
   run commands or read files. Require the executor to surface actual completion
   evidence in the transcript.
-- A resumed session can retain an active goal, but the brief remains the stable
-  contract and a separate progress file carries execution state.
-- If a personal and project skill share the same name, follow Claude Code's
-  configured precedence rather than assuming the two definitions merge.
 
 ## Acceptance access boundary
 
