@@ -79,16 +79,23 @@ goal are limited to these kinds:
 
 - an observed baseline contradicts a material premise;
 - the same validator fails three times without a new hypothesis;
-- required authority, credentials, or external approval is missing;
+- required authority, credentials, or external approval is missing and the
+  core outcome cannot be delivered without it — when the gap only affects some
+  acceptance items, degrade locally instead: mark them unverified, finish the
+  rest, then report;
 - a destructive or externally visible action is needed but not authorized;
 - the time, turn, cost, or source budget is exhausted;
 - progress would require a substantive scope change (mechanical spillover such
   as import updates is allowed with a one-line note in the progress file).
 
-Process hygiene — commit state, branch layout, file tracking status, document
-status values, or the existence of a progress file — is never a precondition
-or stop condition. At most it appears as one advisory line in the acceptance
-report.
+Process hygiene — commit state, branch layout, file tracking status, or the
+existence of a progress file — is never a precondition or stop condition. At
+most it appears as one advisory line in the acceptance report.
+
+Goal status is semantic, not hygiene: only an `已批准`/`Approved` goal may be
+executed. A document in `已完成`/`已废弃` (Completed/Abandoned) state is
+read-only for review and re-enters execution only after the owner explicitly
+reopens it by flipping the status back to approved.
 
 For work likely to span sessions, authorize a separate progress file such as
 `docs/goals/<goal-slug>.progress.md`. The progress file records evidence,
