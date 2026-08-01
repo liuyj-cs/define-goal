@@ -85,8 +85,8 @@
 
 ## 完成契约
 
-- [ ] 结果标准：<<OUTCOME_CRITERION>>；证据：<<OUTCOME_EVIDENCE>>
-- [ ] 约束标准：<<CONSTRAINT_CRITERION>>；证据：<<CONSTRAINT_EVIDENCE>>
+- [ ] AC-01 结果标准：<<OUTCOME_CRITERION>>；证据：<<OUTCOME_EVIDENCE>>
+- [ ] AC-02 约束标准：<<CONSTRAINT_CRITERION>>；证据：<<CONSTRAINT_EVIDENCE>>
 <<ADDITIONAL_CRITERIA>>
 
 只有把每条标准对应的实际命令、输出、文件或来源证据放进执行对话，才算完成；只口头声称“已完成”不算。
@@ -111,3 +111,11 @@
 ```text
 /goal 读取并完成 `<<RELATIVE_PATH>>` 中已批准的目标。把该文件视为结果、范围、权限、约束和验收的完整契约；先执行“执行前复核”，再持续工作，直到“完成契约”每一项都有实际证据出现在执行对话中，或命中已记录的停止条件。
 ```
+
+完成契约全部拿到证据后，执行 Agent 不得自行结项：须立即派一个未参与执行的子 agent，按 define-goal skill 的验收流程独立验收——亲自复跑完成契约命令、临场抽查，全部通过即翻状态并追加结项记录——并把验收报告原样转交所有者，不得改写或摘要。宿主无法派子 agent 时，退回人工方式：在最后一条回复中原样给出下面这行命令，供所有者复制到新会话。
+
+```text
+/define-goal 验收 <<RELATIVE_PATH>>
+```
+
+（Codex 中用 `$define-goal 验收 <<RELATIVE_PATH>>`。）

@@ -1,6 +1,7 @@
 ---
 name: define-goal
-description: Turn a fuzzy, consequential, or long-running intention into a confirmed, evidence-backed, cross-harness goal brief saved under docs/goals with a dated filename and ready for another agent to execute through the built-in /goal mode in Codex or Claude Code. Also accept or verify a completed goal in a fresh session and close it after owner confirmation. Use when the user invokes $define-goal or /define-goal, asks to define or clarify a goal, 写目标、目标任务书、goal prompt, 验收目标、结项, or wants an agent to work autonomously toward a verifiable outcome. Do not use for ordinary implementation whose outcome and checks are already clear, or to start execution unless the user explicitly asks.
+description: Turn a fuzzy, consequential, or long-running intention into a confirmed, evidence-backed, cross-harness goal brief saved under docs/goals with a dated filename and ready for another agent to execute through the built-in /goal mode in Codex or Claude Code. Also accept or verify a completed goal in a fresh session and close it automatically after an independent acceptance pass. Use when the user invokes $define-goal or /define-goal, asks to define or clarify a goal, 写目标、目标任务书、goal prompt, 验收目标、结项, or wants an agent to work autonomously toward a verifiable outcome. Do not use for ordinary implementation whose outcome and checks are already clear, or to start execution unless the user explicitly asks.
+disable-model-invocation: true
 ---
 
 # Define Goal
@@ -185,9 +186,11 @@ After confirmation:
 5. Fill `<<PREEXISTING_WORKTREE_STATE_OR_NONE>>` with the concrete modified or
    untracked items observed before definition, or state that none were observed.
    Do not use this field for every out-of-scope or frozen path.
-6. Keep the optional "Related Goals" section only when another goal has an
-   ordering dependency, overlapping path, or explicit handoff condition. Delete
-   the entire section for an independent goal.
+6. Only six sections are required: 目标陈述, 范围与权限, 执行前复核, 完成契约,
+   停止、升级与续跑, and 跨 Harness 交接. Every other template section is
+   optional — keep it only when it earns its place, and delete the entire
+   section otherwise. For example, keep "Related Goals" only when another goal
+   has an ordering dependency, overlapping path, or explicit handoff condition.
 7. Treat evidence requirements as mandatory and the proposed steps and order as
    advisory. If execution takes another route, require one sentence explaining
    the deviation in the progress file and all originally required evidence.
@@ -232,6 +235,8 @@ Return:
 - a clickable path to the goal document;
 - the exact `/goal ...` command to run;
 - validation evidence;
+- a reminder to commit the approved document before execution starts, so
+  acceptance can diff against that commit as its tamper-check baseline;
 - any still-open, explicitly deferred issue.
 
 If the user explicitly asks to start now and the runtime exposes goal-control
@@ -243,31 +248,45 @@ do not claim the goal started.
 
 Enter this mode when the user invokes a request such as
 `/define-goal 验收 docs/goals/<goal-file>.md`, asks to accept or verify a
-completed goal, or asks to close a goal. Acceptance is model-run: the owner only
-reviews the short report and makes the closure decision.
+completed goal, asks to close a goal, or when an executing agent spawns a
+subagent for automatic acceptance after finishing a goal. Acceptance is
+model-run: the owner only reads the short report. A full pass closes the goal
+in the same step; the owner can ask to revert a closure afterward.
 
-Acceptance must be performed in a fresh session by an agent that did not
-participate in execution. If this session participated, stop and ask the owner
-to start a fresh acceptance session; never let the executing agent grade its own
-work.
+Acceptance must be performed by an agent whose context did not do the work: a
+fresh session started by the owner, or a subagent the executing agent spawns
+right after the Completion Contract evidence is in. A spawning executor passes
+only the goal document path and relays the acceptance report verbatim, without
+rewriting or summarizing it. Never grade work your own context performed; an
+executor that cannot spawn a subagent hands the owner the acceptance command
+instead of accepting.
 
-In the fresh session:
+In the accepting agent:
 
 1. Read the goal document, its authorized progress file when present, current
    repository rules, and current worktree state.
-2. Personally rerun every command named by the Completion Contract. Prior logs
+2. Check that the approved contract survived execution unmodified: diff the
+   goal file against its last approved commit. Only an appended closure record
+   may differ. If the body changed, or no committed baseline exists, say so in
+   the report instead of silently treating the current text as the approved
+   contract.
+3. Personally rerun every command named by the Completion Contract. Prior logs
    are context, not proof that the current state passes.
-3. Derive and run two or three checks not named in the goal document. Choose
+4. Derive and run two or three checks not named in the goal document. Choose
    them at acceptance time from the highest-risk boundaries, anti-cheat rules,
    and likely collateral effects.
-4. If a required command cannot run, report that item as unverified and do not
+5. If a required command cannot run, report that item as unverified and do not
    infer, guess, or close the goal.
-5. Give the owner a plain-language report of no more than five lines covering:
-   pass or fail; what was actually delivered; unmet or unverified items; the
-   independent spot checks; and the next step.
-6. Wait for explicit owner confirmation. Only after confirmation, change the
-   visible status to `已完成`/`Completed` or `已废弃`/`Abandoned`, append the
-   following level-two section, and rerun `validate_goal.py`:
+6. If every Completion Contract item and every spot check passed, change the
+   visible status to `已完成`/`Completed`, append the level-two section shown
+   below, and rerun `validate_goal.py`. If anything failed or could not be
+   verified, leave the status and document untouched; flipping to
+   `已废弃`/`Abandoned` always requires an explicit owner decision.
+7. End with a plain-language report of no more than five lines covering: pass
+   or fail; what was actually delivered; unmet or unverified items; the
+   independent spot checks; and whether the goal was closed, or what decision
+   the owner still needs to make. Closure is one status line plus one appended
+   record; revert it on request.
 
 ```markdown
 ## 结项记录
@@ -275,7 +294,7 @@ In the fresh session:
 - 验收日期：<date>
 - 结论：<completed or abandoned, with reason>
 - 逐项核对与抽查摘要：<completion items and independent checks>
-- 状态翻转记录：<old status -> new status, confirmed by owner>
+- 状态翻转记录：<old status -> new status, closed by the acceptance session>
 ```
 
 Acceptance is the only workflow allowed to change the status of an approved
