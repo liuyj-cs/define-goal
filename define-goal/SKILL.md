@@ -279,11 +279,12 @@ In the accepting agent:
    comply and record the failed or unverified items honestly in the closure
    record. Flipping to `已废弃`/`Abandoned` always requires an explicit owner
    decision.
-6. End with a plain-language report of no more than five lines covering: pass
-   or fail; what was actually delivered; unmet or unverified items; the
-   independent spot checks; and whether the goal was closed, or what decision
-   the owner still needs to make. Closure is one status line plus one appended
-   record; revert it on request.
+6. End with a plain-language report sized by outcome. Full pass: one or two
+   lines at most — independent acceptance passed, how many contract items and
+   spot checks were rerun, goal closed; no per-item detail. Anything failed or
+   unverified: detail only those items — what failed, the evidence, and the
+   decision the owner needs to make. Closure is one status line plus one
+   appended record; revert it on request.
 
 ```markdown
 ## 结项记录
