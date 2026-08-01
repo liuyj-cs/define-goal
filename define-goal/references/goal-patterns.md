@@ -79,14 +79,17 @@ goal are limited to these kinds:
 
 - an observed baseline contradicts a material premise;
 - the same validator fails three times without a new hypothesis;
-- required authority, credentials, or external approval is missing and the
-  core outcome cannot be delivered without it — when the gap only affects some
-  acceptance items, degrade locally instead: mark them unverified, finish the
-  rest, then report;
+- required authority, credentials, or external approval is missing — finish
+  the unaffected items first, mark the affected ones unverified, then stop and
+  report the gap;
 - a destructive or externally visible action is needed but not authorized;
 - the time, turn, cost, or source budget is exhausted;
 - progress would require a substantive scope change (mechanical spillover such
   as import updates is allowed with a one-line note in the progress file).
+
+Every execution ending must land on one of the two legal exits: every
+completion item has evidence, or a documented stop condition is reached. A
+rule that defines an ending outside these two exits is a defect.
 
 Process hygiene — commit state, branch layout, file tracking status, or the
 existence of a progress file — is never a precondition or stop condition. At
@@ -125,5 +128,5 @@ explicitly says otherwise.
   open-source tool when the goal's agent-decided defaults authorize it — never
   sudo or system-level changes. For anything that cannot be installed, such as
   credentials, external services, or environments, mark only the affected items
-  as unverified, complete the rest, and report the gap; never fill it by
-  inference.
+  as unverified, complete the rest, then close by reporting the gap as a
+  documented stop; never fill it by inference.
