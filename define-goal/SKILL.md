@@ -1,6 +1,6 @@
 ---
 name: define-goal
-description: Turn a fuzzy, consequential, or long-running intention into a confirmed, evidence-backed, cross-harness goal brief saved under docs/goals with a dated filename and ready for another agent to execute through the built-in /goal mode in Codex or Claude Code. Also accept or verify a completed goal in a fresh session and close it after owner confirmation. Use when the user invokes $define-goal or /define-goal, asks to define or clarify a goal, 写目标、目标任务书、goal prompt, 验收目标、结项, or wants an agent to work autonomously toward a verifiable outcome. Do not use for ordinary implementation whose outcome and checks are already clear, or to start execution unless the user explicitly asks.
+description: Turn a fuzzy, consequential, or long-running intention into a confirmed, evidence-backed, cross-harness goal brief saved under docs/goals with a dated filename and ready for another agent to execute through the built-in /goal mode in Codex or Claude Code. Also accept or verify a completed goal in a fresh session and close it automatically after an independent acceptance pass. Use when the user invokes $define-goal or /define-goal, asks to define or clarify a goal, 写目标、目标任务书、goal prompt, 验收目标、结项, or wants an agent to work autonomously toward a verifiable outcome. Do not use for ordinary implementation whose outcome and checks are already clear, or to start execution unless the user explicitly asks.
 disable-model-invocation: true
 ---
 
