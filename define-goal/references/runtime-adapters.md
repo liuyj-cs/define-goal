@@ -9,13 +9,16 @@ be the agent that executes it.
 | Artifact | Codex | Claude Code |
 | --- | --- | --- |
 | `SKILL.md` | Required workflow, triggering metadata | Required workflow, triggering metadata, and `/define-goal` command source |
-| `agents/openai.yaml` | Optional OpenAI/Codex UI label and default prompt | Ignored; no equivalent `agents/claude.yaml` exists |
+| `agents/openai.yaml` | Optional OpenAI/Codex UI metadata and invocation policy | Ignored; no equivalent `agents/claude.yaml` exists |
 | `references/` and `assets/` | Read relative to the skill | Read relative to the skill |
 | `scripts/validate_goal.py` | Run from the installed skill path | Run through `${CLAUDE_SKILL_DIR}` |
 
-Keep the shared `SKILL.md` frontmatter limited to `name` and `description`.
-Claude-specific frontmatter is unnecessary for this workflow and would weaken
-portability. Do not invent a Claude metadata file merely to mirror
+Keep the shared `SKILL.md` frontmatter limited to `name`, `description`, and
+`disable-model-invocation`. Both hosts block implicit invocation of this skill:
+Claude Code through `disable-model-invocation: true` (a Claude-only field other
+hosts ignore), Codex through `policy.allow_implicit_invocation: false` in
+`agents/openai.yaml`. Explicit `/define-goal` and `$define-goal` invocation
+still works. Do not invent a Claude metadata file merely to mirror
 `agents/openai.yaml`.
 
 Never store the defining or executing harness as goal metadata. Put
@@ -30,6 +33,9 @@ a fresh agent with repository access and no definition-session context.
 - Invoke this skill with `$define-goal` or select it through `/skills`.
 - Invoke acceptance in a fresh, non-executing session with a request such as
   `$define-goal 验收 docs/goals/<file>.md`.
+- Codex delegates to subagents when skill or goal instructions request it. Use
+  that for automatic acceptance after execution; fall back to handing the owner
+  the acceptance command when delegation is unavailable.
 - Execute the approved brief with the built-in `/goal <objective>`.
 - When goal-control tools are exposed, read current state before creating a
   goal. Create or replace a goal only after explicit user authorization.
@@ -52,6 +58,9 @@ a fresh agent with repository access and no definition-session context.
   to the loaded instructions.
 - Invoke acceptance in a fresh, non-executing session with
   `/define-goal 验收 docs/goals/<file>.md`.
+- For automatic acceptance after execution, spawn the acceptance subagent with
+  the Agent tool; it starts with fresh context and counts as a non-participating
+  agent.
 - For enumerable decision choices during definition, use `AskUserQuestion` when
   it is available; keep each option concrete and preserve the skill's rule that
   load-bearing decisions are resolved one at a time.

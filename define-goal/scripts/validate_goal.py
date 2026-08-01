@@ -9,24 +9,26 @@ import sys
 from pathlib import Path, PurePosixPath
 
 
-SECTION_ALIASES = {
+REQUIRED_SECTION_ALIASES = {
     "goal-statement": ("目标陈述", "Goal Statement"),
+    "scope": ("范围与权限", "Scope and Authority"),
+    "preflight": ("执行前复核", "Execution Preflight"),
+    "completion-contract": ("完成契约", "Completion Contract"),
+    "stop-conditions": ("停止、升级与续跑", "Stop, Escalation, and Resume"),
+    "handoff": ("跨 Harness 交接", "Cross-Harness Handoff"),
+}
+OPTIONAL_SECTION_ALIASES = {
     "why": ("为什么要做", "Why This Matters"),
     "current-state": ("已知事实与来源", "Known Facts and Sources"),
     "decisions": (
         "已确认决策、假设与留白",
         "Confirmed Decisions, Assumptions, and Open Items",
     ),
-    "scope": ("范围与权限", "Scope and Authority"),
     "constraints": (
         "约束、优先级与防绕过",
         "Constraints, Priorities, and Anti-Cheating",
     ),
-    "preflight": ("执行前复核", "Execution Preflight"),
     "evidence-plan": ("工作与取证路径", "Work and Evidence Plan"),
-    "completion-contract": ("完成契约", "Completion Contract"),
-    "stop-conditions": ("停止、升级与续跑", "Stop, Escalation, and Resume"),
-    "handoff": ("跨 Harness 交接", "Cross-Harness Handoff"),
 }
 TYPE_ALIASES = {
     "execution": {"execution", "执行型"},
@@ -249,13 +251,15 @@ def validate(path: Path) -> list[str]:
         errors.append("unresolved placeholders: " + ", ".join(placeholders))
 
     bodies: dict[str, str] = {}
-    for name, aliases in SECTION_ALIASES.items():
+    all_sections = {**REQUIRED_SECTION_ALIASES, **OPTIONAL_SECTION_ALIASES}
+    for name, aliases in all_sections.items():
         body, count = section_body(text, aliases)
         if count == 0 or body is None:
-            errors.append(f"missing required section: {aliases[0]}")
+            if name in REQUIRED_SECTION_ALIASES:
+                errors.append(f"missing required section: {aliases[0]}")
             continue
         if count > 1:
-            errors.append(f"duplicate required section: {aliases[0]}")
+            errors.append(f"duplicate section: {aliases[0]}")
         bodies[name] = body
         if not content_without_subheadings(body):
             errors.append(f"section has no content: {aliases[0]}")

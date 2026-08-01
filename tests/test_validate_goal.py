@@ -80,11 +80,14 @@ class GoalValidatorTests(unittest.TestCase):
     def test_filled_new_template_example_is_valid(self) -> None:
         self.assert_valid("valid-full-template.md", status="已批准")
 
+    def test_minimal_goal_with_only_required_sections_is_valid(self) -> None:
+        self.assert_valid("valid-minimal.md", status="已批准")
+
     def test_existing_error_categories_remain_rejected(self) -> None:
         base = (FIXTURES / "valid-zh.md").read_text(encoding="utf-8")
         cases = {
             "missing required section": base.replace(
-                "## 为什么要做\n\n用于验证兼容性。\n\n", ""
+                "## 范围与权限\n\n- 仅修改授权文件。\n\n", ""
             ),
             "unresolved placeholders": base.replace(
                 "## 为什么要做\n", "## 为什么要做\n\n<<TODO>>\n"
