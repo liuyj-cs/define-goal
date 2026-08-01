@@ -20,40 +20,6 @@ Order questions by dependency, impact, irreversibility, and cost of being wrong.
 A useful question gives a recommendation, its basis, and the strongest
 counterargument. Do not turn the interview into a questionnaire.
 
-## Classification
-
-### Execution
-
-Use when an observable system or artifact must change. Require:
-
-- starting state or a first-step reproduction;
-- allowed change surface;
-- result validator;
-- constraint validator;
-- plausible anti-cheat guard;
-- rollback or escalation trigger.
-
-### Exploration
-
-Use when the deliverable is knowledge or a decision. Require:
-
-- the decision the work must enable;
-- source and recency boundaries;
-- evidence standard and reproducibility;
-- treatment of conflicting or missing evidence;
-- a research budget or stop rule;
-- an honest "best answer so far" outcome when uncertainty remains.
-
-Do not reward a large number of sources or conclusions. Two reproducible,
-decision-relevant findings are better than ten padded claims.
-
-### Mixed
-
-Use only when a named exploratory decision gates a bounded execution phase.
-State the gate, the allowed choices, and what happens if evidence cannot resolve
-it. Split separate goals when phases have different owners, permissions, or
-independent completion conditions.
-
 ## Evidence patterns
 
 | Domain | Outcome evidence | Constraint evidence |
@@ -108,14 +74,31 @@ section out of independent goals instead of filling it with decorative text.
 
 ## Stop and resume
 
-Use bounded persistence, not endless grinding. Typical stop conditions:
+Use bounded persistence, not endless grinding. Stop conditions written into a
+goal are limited to these kinds:
 
 - an observed baseline contradicts a material premise;
 - the same validator fails three times without a new hypothesis;
-- required authority, credentials, or external approval is missing;
+- required authority, credentials, or external approval is missing — finish
+  the unaffected items first, mark the affected ones unverified, then stop and
+  report the gap;
 - a destructive or externally visible action is needed but not authorized;
 - the time, turn, cost, or source budget is exhausted;
-- progress would require expanding the approved scope.
+- progress would require a substantive scope change (mechanical spillover such
+  as import updates is allowed with a one-line note in the progress file).
+
+Every execution ending must land on one of the two legal exits: every
+completion item has evidence, or a documented stop condition is reached. A
+rule that defines an ending outside these two exits is a defect.
+
+Process hygiene — commit state, branch layout, file tracking status, or the
+existence of a progress file — is never a precondition or stop condition. At
+most it appears as one advisory line in the acceptance report.
+
+Goal status is semantic, not hygiene: only an `已批准`/`Approved` goal may be
+executed. A document in `已完成`/`已废弃` (Completed/Abandoned) state is
+read-only for review and re-enters execution only after the owner explicitly
+reopens it by flipping the status back to approved.
 
 For work likely to span sessions, authorize a separate progress file such as
 `docs/goals/<goal-slug>.progress.md`. The progress file records evidence,
@@ -141,6 +124,9 @@ explicitly says otherwise.
   executor to revalidate drift-prone facts before mutation.
 - Keep the approved goal immutable across handoff. Record execution progress in
   a separate file and require owner confirmation for amendments.
-- If the receiving harness cannot access a required source, tool, credential,
-  or environment, treat that as a stop condition rather than filling the gap by
-  inference.
+- If the receiving harness lacks a required tool, install a missing common
+  open-source tool when the goal's agent-decided defaults authorize it — never
+  sudo or system-level changes. For anything that cannot be installed, such as
+  credentials, external services, or environments, mark only the affected items
+  as unverified, complete the rest, then close by reporting the gap as a
+  documented stop; never fill it by inference.

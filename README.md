@@ -30,7 +30,8 @@ links should be inspected before replacement.
 
 ## Validation and tests
 
-Validate one goal document:
+Validate one goal document (a `VALID` result means the structure is legal; it
+does not certify that the content is semantically self-contained):
 
 ```bash
 python3 define-goal/scripts/validate_goal.py docs/goals/<goal-file>.md

@@ -30,11 +30,6 @@ OPTIONAL_SECTION_ALIASES = {
     ),
     "evidence-plan": ("工作与取证路径", "Work and Evidence Plan"),
 }
-TYPE_ALIASES = {
-    "execution": {"execution", "执行型"},
-    "exploration": {"exploration", "探索型"},
-    "mixed": {"mixed", "混合型"},
-}
 STATUS_VALUES = {
     "approved",
     "completed",
@@ -157,16 +152,6 @@ def visible_metadata(text: str, labels: tuple[str, ...]) -> str | None:
     return match.group(1).replace("`", "").strip()
 
 
-def canonical_goal_type(value: str | None) -> str | None:
-    if value is None:
-        return None
-    normalized = value.casefold()
-    for canonical, aliases in TYPE_ALIASES.items():
-        if normalized in {alias.casefold() for alias in aliases}:
-            return canonical
-    return None
-
-
 def content_without_subheadings(body: str) -> str:
     lines = []
     for line in body.splitlines():
@@ -226,15 +211,6 @@ def validate(path: Path) -> list[str]:
             "Approved/Completed/Abandoned"
         )
 
-    goal_type = canonical_goal_type(
-        visible_metadata(text, ("目标类型", "Goal Type"))
-    )
-    if goal_type is None:
-        errors.append(
-            "visible goal type must be 执行型/探索型/混合型 or "
-            "execution/exploration/mixed"
-        )
-
     declared_path = visible_metadata(text, ("目标文档", "Goal Document"))
     if relative_path and declared_path != relative_path:
         errors.append(
@@ -281,13 +257,6 @@ def validate(path: Path) -> list[str]:
         errors.append("stop conditions must contain at least one list item")
 
     handoff = bodies.get("handoff", "")
-    if "harness" not in handoff.casefold():
-        errors.append("cross-harness handoff section must name the harness boundary")
-    if "定义会话" not in handoff and "definition session" not in handoff.casefold():
-        errors.append(
-            "cross-harness handoff must state that definition-session context is not required"
-        )
-
     launch_commands = [
         line.strip() for line in handoff.splitlines() if line.strip().startswith("/goal ")
     ]
@@ -315,15 +284,9 @@ def main() -> int:
         return 1
 
     text = args.goal_file.read_text(encoding="utf-8")
-    goal_type = canonical_goal_type(
-        visible_metadata(text, ("目标类型", "Goal Type"))
-    )
     status = visible_metadata(text, ("状态", "Status"))
     relative_path = goal_relative_path(args.goal_file)
-    print(
-        f"VALID: {relative_path} "
-        f"(type={goal_type}, status={status}, cross_harness=yes)"
-    )
+    print(f"VALID: {relative_path} (status={status})")
     return 0
 
 
